@@ -1,0 +1,2 @@
+# chatagotchi
+ai tamagotchi
