@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+@layer components {
+  .pet-container {
+    @apply relative w-32 h-32 mx-auto mb-6 transition-all duration-500;
+  }
+  
+  .pet-happy {
+    @apply text-6xl animate-bounce-slow;
+  }
+  
+  .pet-sad {
+    @apply text-6xl text-gray-400 animate-pulse-slow;
+  }
+  
+  .stat-bar {
+    @apply w-full h-3 bg-gray-200 rounded-full overflow-hidden;
+  }
+  
+  .stat-fill {
+    @apply h-full transition-all duration-700 ease-out;
+  }
+  
+  .action-button {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 
+           hover:scale-105 active:scale-95 shadow-md hover:shadow-lg;
+  }
+}
