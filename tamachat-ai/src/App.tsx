@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePetStore } from './store/petStore';
 import { usePetTimer } from './hooks/usePetTimer';
 import { getGroqAIStatusMessage as getAIStatusMessage } from './services/groqAiService';
@@ -7,12 +7,34 @@ import { ActivityToast } from './components/ActivityToast';
 import { ChatInterface } from './components/Chat/ChatInterface';
 import { useActivityToast } from './hooks/useActivityToast';
 import { MessageSquare, Heart, Gamepad2, Settings } from 'lucide-react';
+import { PetCharacter } from './types';
 
 function App() {
-  const { pet, performAction, setPetCharacter, setPetName } = usePetStore();
+  const { pet, performAction, setPetCharacter, setPetName, createPet } = usePetStore();
   const { needsAttention } = usePetTimer();
   const { activities, isVisible, addActivity, toggleVisibility } = useActivityToast();
   const [activeTab, setActiveTab] = useState<'care' | 'chat'>('care');
+
+  // Controlla se c'è un pet selezionato dalla landing page
+  useEffect(() => {
+    const selectedPet = localStorage.getItem('selectedPet') as PetCharacter;
+    if (selectedPet && (!pet || pet.name === 'MioPet')) {
+      const characterNames = {
+        pupi: 'Pupi',
+        fufi: 'Fufi', 
+        titi: 'Titi'
+      };
+      createPet(characterNames[selectedPet], 'playful', selectedPet);
+      localStorage.removeItem('selectedPet'); // Pulisci dopo l'uso
+    }
+  }, [pet, createPet]);
+
+  // Reindirizza alla landing se nessun pet è configurato
+  useEffect(() => {
+    if (!pet || pet.name === 'MioPet') {
+      window.location.href = '/home';
+    }
+  }, [pet]);
 
   // Handle action with activity notification
   const handleAction = (action: 'feed' | 'play' | 'clean' | 'sleep') => {
