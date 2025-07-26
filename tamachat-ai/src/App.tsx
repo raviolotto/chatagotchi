@@ -2,58 +2,81 @@ import React from 'react';
 import { usePetStore } from './store/petStore';
 import { usePetTimer } from './hooks/usePetTimer';
 import { getAIStatusMessage } from './services/aiService';
+import { PetDisplay } from './components/PetDisplay';
+import { ActivityToast } from './components/ActivityToast';
+import { useActivityToast } from './hooks/useActivityToast';
 
 function App() {
-  const { pet, performAction, getPetEmoji } = usePetStore();
+  const { pet, performAction, setPetCharacter, setPetName } = usePetStore();
   const { needsAttention } = usePetTimer();
+  const { activities, isVisible, addActivity, toggleVisibility } = useActivityToast();
+
+  // Handle action with activity notification
+  const handleAction = (action: 'feed' | 'play' | 'clean' | 'sleep') => {
+    performAction(action);
+    
+    const actionMessages = {
+      feed: `${pet.name} ha mangiato!`,
+      play: `${pet.name} si è divertito!`,
+      clean: `${pet.name} è stato pulito!`,
+      sleep: `${pet.name} ha fatto un sonnellino!`
+    };
+    
+    addActivity(actionMessages[action]);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
-      <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-6">
+    <div 
+      className="min-h-screen w-full flex items-center justify-center p-4"
+      style={{
+        backgroundImage: 'url(/background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+      
+      <div className="w-full max-w-4xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">
             TamaChat AI
           </h1>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-white text-opacity-90 drop-shadow">
             {getAIStatusMessage()}
           </div>
         </div>
 
         {/* Pet Display */}
-        <div className="text-center mb-8">
-          <div className="pet-container">
-            <div className={`text-8xl ${needsAttention ? 'animate-pulse' : 'animate-bounce-slow'}`}>
-              {getPetEmoji()}
-            </div>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">
-            {pet.name}
-          </h2>
-          <div className="text-sm text-gray-500 capitalize">
+        <div className="text-center mb-12">
+          <PetDisplay
+            character={pet.character}
+            mood={pet.mood}
+            name={pet.name}
+            needsAttention={needsAttention}
+            onNameChange={setPetName}
+            onCharacterChange={setPetCharacter}
+          />
+          <div className="text-sm text-white text-opacity-90 capitalize mt-4 drop-shadow">
             Personalità: {pet.personality} • Umore: {pet.mood}
           </div>
-          {needsAttention && (
-            <div className="mt-2 text-red-500 text-sm font-medium animate-pulse">
-              ⚠️ Ha bisogno di attenzioni!
-            </div>
-          )}
         </div>
 
         {/* Stats */}
-        <div className="space-y-3 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 max-w-2xl mx-auto">
           {[
-            { label: 'Fame', value: pet.hunger, icon: '🍖', key: 'hunger' as const },
-            { label: 'Felicità', value: pet.happiness, icon: '😊', key: 'happiness' as const },
-            { label: 'Energia', value: pet.energy, icon: '⚡', key: 'energy' as const },
-            { label: 'Igiene', value: pet.hygiene, icon: '🛁', key: 'hygiene' as const }
-          ].map(({ label, value, icon, key }) => (
-            <div key={key} className="flex items-center gap-3">
-              <span className="text-lg">{icon}</span>
-              <span className="text-sm font-medium text-gray-600 w-16">
+            { label: 'Fame', value: pet.hunger, key: 'hunger' as const },
+            { label: 'Felicità', value: pet.happiness, key: 'happiness' as const },
+            { label: 'Energia', value: pet.energy, key: 'energy' as const },
+            { label: 'Igiene', value: pet.hygiene, key: 'hygiene' as const }
+          ].map(({ label, value, key }) => (
+            <div key={key} className="bg-white bg-opacity-90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white border-opacity-30">
+              <div className="text-sm font-medium text-gray-700 mb-2 text-center">
                 {label}
-              </span>
-              <div className="flex-1 stat-bar">
+              </div>
+              <div className="stat-bar mb-2">
                 <div 
                   className={`stat-fill ${
                     value > 60 ? 'bg-green-500' : 
@@ -62,77 +85,37 @@ function App() {
                   style={{ width: `${value}%` }}
                 />
               </div>
-              <span className="text-xs text-gray-500 w-10">
+              <div className="text-xs text-gray-600 text-center">
                 {Math.round(value)}%
-              </span>
+              </div>
             </div>
           ))}
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 max-w-2xl mx-auto">
           {[
-            { action: 'feed' as const, label: 'Nutri', icon: '🍖', color: 'bg-green-500 hover:bg-green-600' },
-            { action: 'play' as const, label: 'Gioca', icon: '🎾', color: 'bg-blue-500 hover:bg-blue-600' },
-            { action: 'clean' as const, label: 'Pulisci', icon: '🛁', color: 'bg-purple-500 hover:bg-purple-600' },
-            { action: 'sleep' as const, label: 'Nanna', icon: '💤', color: 'bg-indigo-500 hover:bg-indigo-600' }
-          ].map(({ action, label, icon, color }) => (
+            { action: 'feed' as const, label: 'Nutri', color: 'bg-green-500 hover:bg-green-600' },
+            { action: 'play' as const, label: 'Gioca', color: 'bg-blue-500 hover:bg-blue-600' },
+            { action: 'clean' as const, label: 'Pulisci', color: 'bg-purple-500 hover:bg-purple-600' },
+            { action: 'sleep' as const, label: 'Nanna', color: 'bg-indigo-500 hover:bg-indigo-600' }
+          ].map(({ action, label, color }) => (
             <button
               key={action}
-              onClick={() => performAction(action)}
-              className={`action-button text-white ${color}`}
+              onClick={() => handleAction(action)}
+              className={`py-4 px-6 rounded-full text-white font-medium text-sm transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg ${color}`}
             >
-              <span className="text-lg mr-2">{icon}</span>
               {label}
             </button>
           ))}
         </div>
 
-        {/* Recent Messages Preview */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">
-            💬 Ultimi messaggi
-          </h3>
-          <div className="space-y-2 max-h-32 overflow-y-auto">
-            {pet.conversationHistory.slice(-3).map((message) => (
-              <div key={message.id} className="text-sm">
-                <span className="font-medium text-gray-600">
-                  {message.sender === 'user' ? 'Tu' : pet.name}:
-                </span>
-                <span className="ml-2 text-gray-700">
-                  {message.content}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Setup Status */}
-        <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-          <h3 className="text-sm font-semibold text-green-800 mb-2">
-            ✅ Setup Completato!
-          </h3>
-          <div className="text-xs text-green-700 space-y-1">
-            <div>• Store Zustand: Funzionante</div>
-            <div>• Timer automatico: Attivo</div>
-            <div>• Persistenza dati: LocalStorage</div>
-            <div>• Degradazione stats: Attiva</div>
-            <div>• Servizio AI: {getAIStatusMessage()}</div>
-          </div>
-        </div>
-
-        {/* Next Steps */}
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h3 className="text-sm font-semibold text-blue-800 mb-2">
-            🚀 Prossimi Passi
-          </h3>
-          <div className="text-xs text-blue-700 space-y-1">
-            <div>1. Implementare i componenti UI dettagliati</div>
-            <div>2. Aggiungere l'interfaccia chat</div>
-            <div>3. Migliorare le animazioni</div>
-            <div>4. Testing e ottimizzazioni</div>
-          </div>
-        </div>
+        {/* Activity Toast */}
+        <ActivityToast
+          activities={activities}
+          isVisible={isVisible}
+          onToggle={toggleVisibility}
+        />
       </div>
     </div>
   );

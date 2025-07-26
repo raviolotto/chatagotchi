@@ -7,15 +7,19 @@ import {
   PetMood, 
   PetStats, 
   PetPersonality,
+  PetCharacter,
   ChatMessage,
   PET_EMOJIS,
+  PET_IMAGES,
+  CHARACTER_NAMES,
   PERSONALITY_TRAITS 
 } from '../types';
 
 // Default pet state
-const createDefaultPet = (name: string, personality: PetPersonality): PetState => ({
+const createDefaultPet = (name: string, personality: PetPersonality, character: PetCharacter = 'fufi'): PetState => ({
   id: `pet_${Date.now()}`,
   name,
+  character,
   personality,
   mood: 'happy',
   hunger: 100,
@@ -28,7 +32,7 @@ const createDefaultPet = (name: string, personality: PetPersonality): PetState =
     {
       id: 'welcome',
       sender: 'pet',
-      content: `Ciao! Sono ${name}! Sono così felice di conoscerti! 🐾`,
+      content: `Ciao! Sono ${name}! Sono così felice di conoscerti!`,
       timestamp: Date.now(),
       mood: 'excited'
     }
@@ -83,13 +87,13 @@ const getStatColor = (statType: keyof PetStats, value: number): string => {
 export const usePetStore = create<PetStore>()(
   persist(
     (set, get) => ({
-      pet: createDefaultPet('MioPet', 'playful'),
+      pet: createDefaultPet('MioPet', 'playful', 'fufi'),
       isLoading: false,
       error: null,
 
       // Actions
-      createPet: (name: string, personality: PetPersonality) => {
-        const newPet = createDefaultPet(name, personality);
+      createPet: (name: string, personality: PetPersonality, character: PetCharacter) => {
+        const newPet = createDefaultPet(name, personality, character);
         // Apply personality base stats
         const personalityTraits = PERSONALITY_TRAITS[personality];
         const updatedPet = {
@@ -134,10 +138,10 @@ export const usePetStore = create<PetStore>()(
           
           // Create action message
           const actionMessages = {
-            feed: `Mmm, delizioso! Grazie per avermi nutrito! 🍖`,
-            play: `Che divertimento! Mi piace giocare con te! 🎾`,
-            clean: `Ahh, molto meglio! Ora sono tutto pulito! 🛁`,
-            sleep: `Zzz... che bel sonnellino ristoratore! 💤`
+            feed: `Mmm, delizioso! Grazie per avermi nutrito!`,
+            play: `Che divertimento! Mi piace giocare con te!`,
+            clean: `Ahh, molto meglio! Ora sono tutto pulito!`,
+            sleep: `Zzz... che bel sonnellino ristoratore!`
           };
           
           const actionMessage: ChatMessage = {
@@ -180,10 +184,36 @@ export const usePetStore = create<PetStore>()(
         }));
       },
 
+      setPetCharacter: (character: PetCharacter) => {
+        set((state) => ({
+          pet: {
+            ...state.pet,
+            character,
+            name: CHARACTER_NAMES[character], // Aggiorna automaticamente il nome
+            lastInteraction: Date.now()
+          }
+        }));
+      },
+
+      setPetName: (name: string) => {
+        set((state) => ({
+          pet: {
+            ...state.pet,
+            name,
+            lastInteraction: Date.now()
+          }
+        }));
+      },
+
       // Getters
       getPetEmoji: () => {
         const { pet } = get();
         return PET_EMOJIS[pet.mood] || '😊';
+      },
+
+      getPetImage: () => {
+        const { pet } = get();
+        return PET_IMAGES[pet.character];
       },
 
       getStatColor: (statType: keyof PetStats) => {

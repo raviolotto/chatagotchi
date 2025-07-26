@@ -1,7 +1,11 @@
+// Character Types
+export type PetCharacter = 'fufi' | 'pupi' | 'titi';
+
 // Core Pet Types
 export interface PetState {
   id: string;
   name: string;
+  character: PetCharacter;
   hunger: number;        // 0-100
   happiness: number;     // 0-100
   energy: number;        // 0-100
@@ -73,14 +77,17 @@ export interface PetStore {
   error: string | null;
   
   // Actions
-  createPet: (name: string, personality: PetPersonality) => void;
+  createPet: (name: string, personality: PetPersonality, character: PetCharacter) => void;
   updatePetStats: (stats: Partial<PetStats>) => void;
   performAction: (action: PetAction) => void;
   addChatMessage: (message: ChatMessage) => void;
   updatePetMood: (mood: PetMood) => void;
+  setPetCharacter: (character: PetCharacter) => void;
+  setPetName: (name: string) => void;
   
   // Getters
   getPetEmoji: () => string;
+  getPetImage: () => string;
   getStatColor: (statType: keyof PetStats) => string;
   needsAttention: () => boolean;
 }
@@ -94,6 +101,18 @@ export const PET_EMOJIS: Record<PetMood, string> = {
   dirty: '🤢',
   excited: '🤩',
   content: '😌'
+};
+
+export const PET_IMAGES: Record<PetCharacter, string> = {
+  fufi: '/fufi.png',
+  pupi: '/pupi.png',
+  titi: '/titi.png'
+};
+
+export const CHARACTER_NAMES: Record<PetCharacter, string> = {
+  fufi: 'Fufi',
+  pupi: 'Pupi',
+  titi: 'Titi'
 };
 
 export const PERSONALITY_TRAITS: Record<PetPersonality, {
