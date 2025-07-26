@@ -20,9 +20,9 @@ export const ActivityToast: React.FC<ActivityToastProps> = ({
 }) => {
   return (
     <>
-      {/* Single Clean Notification Stack */}
+      {/* Single Clean Notification Stack - LEFT SIDE */}
       {activities.length > 0 && (
-        <div className="fixed bottom-16 right-6 max-w-xs z-40">
+        <div className="fixed bottom-16 left-6 max-w-xs z-40">
           <div className="space-y-2">
             {activities.map((activity, index) => {
               // Show only recent activity when toggle is off
@@ -32,13 +32,12 @@ export const ActivityToast: React.FC<ActivityToastProps> = ({
                 <div
                   key={activity.id}
                   className={`
-                    transition-all duration-500 ease-out transform
+                    transition-all duration-500 ease-out
                     ${activity.isRecent 
-                      ? 'text-xl font-semibold text-white animate-fade-in-scale' 
-                      : 'text-sm text-white opacity-60'
+                      ? 'text-xl font-semibold text-gray-800' 
+                      : 'text-sm text-gray-600 opacity-60'
                     }
-                    ${index === 0 ? 'animate-slide-in-right' : ''}
-                    text-right leading-tight
+                    text-left leading-tight
                   `}
                 >
                   {activity.content}
@@ -49,17 +48,16 @@ export const ActivityToast: React.FC<ActivityToastProps> = ({
         </div>
       )}
 
-      {/* Minimal Toggle Button - Under the text */}
+      {/* Minimal Toggle Button - FIXED BOTTOM LEFT */}
       <button
         onClick={onToggle}
         className={`
-          fixed bottom-6 right-6 w-8 h-8 rounded-full shadow-lg hover:shadow-xl 
-          transition-all duration-200 flex items-center justify-center z-50 hover:scale-110
-          ${isVisible ? 'bg-gray-800 bg-opacity-70 text-white' : 'bg-white bg-opacity-80 text-gray-600'}
-          border border-gray-300 border-opacity-50
+          fixed bottom-6 left-6 w-10 h-10 rounded-3xl 
+          transition-colors flex items-center justify-center z-50
+          ${isVisible ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 border border-gray-200'}
         `}
       >
-        <span className="text-xs">
+        <span className="text-sm font-medium">
           {isVisible ? '×' : '+'}
         </span>
       </button>

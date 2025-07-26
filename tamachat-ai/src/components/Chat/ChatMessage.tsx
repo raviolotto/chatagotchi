@@ -18,14 +18,14 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
-      <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+      <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-3xl ${
         isUser 
-          ? 'bg-blue-500 text-white rounded-br-none' 
-          : 'bg-gray-100 text-gray-800 rounded-bl-none'
+          ? 'bg-blue-500 text-white' 
+          : 'bg-gray-100 text-gray-800'
       }`}>
         {/* Avatar per il pet */}
         {!isUser && (
-          <div className="flex items-center mb-1">
+          <div className="flex items-center mb-2">
             <span className="text-lg mr-2">
               {message.mood ? 
                 ({'happy': '😊', 'sad': '😢', 'hungry': '😋', 'sleepy': '😴', 'dirty': '🤢', 'excited': '🤩', 'content': '😌'}[message.mood] || '😊') 
@@ -44,7 +44,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         </p>
         
         {/* Timestamp */}
-        <div className={`text-xs mt-1 ${
+        <div className={`text-xs mt-2 ${
           isUser ? 'text-blue-100' : 'text-gray-500'
         }`}>
           {timeAgo}
