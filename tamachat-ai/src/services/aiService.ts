@@ -113,16 +113,19 @@ const analyzeMoodFromResponse = (response: string, currentMood: PetMood): PetMoo
   return currentMood; // Keep current mood if no clear indicator
 };
 
-// Main AI service function
+// Enhanced AI service function
 export const getAIResponse = async (
   userMessage: string,
   pet: PetState
 ): Promise<AIResponse> => {
   try {
-    // If no OpenAI API key, use fallback
+    // Add typing delay for realism
+    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+
+    // If no OpenAI API key, use enhanced fallback
     if (!openai) {
       console.warn('OpenAI API key not found, using fallback responses');
-      const content = getFallbackResponse(pet.mood);
+      const content = getContextualFallbackResponse(userMessage, pet);
       return {
         content,
         mood: pet.mood
@@ -136,7 +139,7 @@ export const getAIResponse = async (
         content: buildSystemPrompt(pet)
       },
       // Include last few messages for context
-      ...pet.conversationHistory.slice(-6).map(msg => ({
+      ...pet.conversationHistory.slice(-8).map(msg => ({
         role: msg.sender === 'user' ? 'user' as const : 'assistant' as const,
         content: msg.content
       })),
@@ -149,29 +152,67 @@ export const getAIResponse = async (
     const completion = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages,
-      max_tokens: 150,
-      temperature: 0.8,
-      presence_penalty: 0.3,
-      frequency_penalty: 0.3
+      max_tokens: 120,
+      temperature: 0.9,
+      presence_penalty: 0.4,
+      frequency_penalty: 0.3,
+      top_p: 0.95
     });
 
     const aiContent = completion.choices[0]?.message?.content || getFallbackResponse(pet.mood);
     const newMood = analyzeMoodFromResponse(aiContent, pet.mood);
 
     return {
-      content: aiContent,
+      content: aiContent.trim(),
       mood: newMood
     };
 
   } catch (error) {
     console.error('AI Service Error:', error);
     
-    // Fallback on error
+    // Enhanced fallback on error
     return {
-      content: getFallbackResponse(pet.mood),
+      content: getContextualFallbackResponse(userMessage, pet),
       mood: pet.mood
     };
   }
+};
+
+// Enhanced fallback with context awareness
+const getContextualFallbackResponse = (userMessage: string, pet: PetState): string => {
+  const lowerMessage = userMessage.toLowerCase();
+  
+  // Contextual responses based on user input
+  if (lowerMessage.includes('ciao') || lowerMessage.includes('salve')) {
+    return `Ciao! Sono ${pet.name} e sono ${pet.mood === 'happy' ? 'felicissimo' : 'qui con te'}! Come va? 😊`;
+  }
+  
+  if (lowerMessage.includes('come stai') || lowerMessage.includes('come va')) {
+    if (pet.hunger < 30) return `Beh, ho un po' di fame... potresti darmi qualcosa da mangiare? 🍖`;
+    if (pet.happiness < 30) return `Non mi sento molto bene... hai voglia di giocare con me? 😢`;
+    if (pet.energy < 30) return `Sono un po' stanchino... forse dovrei riposare un po'... 😴`;
+    if (pet.hygiene < 30) return `Ehm... credo di aver bisogno di una bella pulita! 🛁`;
+    return `Sto benissimo! È una giornata fantastica! 😊`;
+  }
+  
+  if (lowerMessage.includes('grazie')) {
+    return `Prego! È sempre un piacere stare con te! 💕`;
+  }
+  
+  if (lowerMessage.includes('ti amo') || lowerMessage.includes('ti voglio bene')) {
+    return `Aww! Anch'io ti voglio un mondo di bene! Sei il migliore! 🥰`;
+  }
+  
+  if (lowerMessage.includes('storia') || lowerMessage.includes('racconta')) {
+    return `Oh, adoro le storie! Una volta ho sognato di volare sulle nuvole... era magico! ✨`;
+  }
+  
+  if (lowerMessage.includes('gioco') || lowerMessage.includes('giocare')) {
+    return `Sì sì sì! Adoro giocare! Cosa facciamo? 🎾`;
+  }
+  
+  // Default fallback based on mood
+  return getFallbackResponse(pet.mood);
 };
 
 // Health check for AI service

@@ -32,7 +32,7 @@ const createDefaultPet = (name: string, personality: PetPersonality, character: 
     {
       id: 'welcome',
       sender: 'pet',
-      content: `Ciao! Sono ${name}! Sono così felice di conoscerti!`,
+      content: `Ciao! Sono ${name}! Sono così felice di conoscerti! 🐾`,
       timestamp: Date.now(),
       mood: 'excited'
     }
@@ -138,10 +138,10 @@ export const usePetStore = create<PetStore>()(
           
           // Create action message
           const actionMessages = {
-            feed: `Mmm, delizioso! Grazie per avermi nutrito!`,
-            play: `Che divertimento! Mi piace giocare con te!`,
-            clean: `Ahh, molto meglio! Ora sono tutto pulito!`,
-            sleep: `Zzz... che bel sonnellino ristoratore!`
+            feed: `Mmm, delizioso! Grazie per avermi nutrito! 🍖`,
+            play: `Che divertimento! Mi piace giocare con te! 🎾`,
+            clean: `Ahh, molto meglio! Ora sono tutto pulito! 🛁`,
+            sleep: `Zzz... che bel sonnellino ristoratore! 💤`
           };
           
           const actionMessage: ChatMessage = {
@@ -165,11 +165,36 @@ export const usePetStore = create<PetStore>()(
       },
 
       addChatMessage: (message: ChatMessage) => {
+        set((state) => {
+          // Limit conversation history to last 50 messages for performance
+          const updatedHistory = [...state.pet.conversationHistory, message];
+          const trimmedHistory = updatedHistory.length > 50 
+            ? updatedHistory.slice(-50) 
+            : updatedHistory;
+
+          return {
+            pet: {
+              ...state.pet,
+              conversationHistory: trimmedHistory,
+              lastInteraction: Date.now()
+            }
+          };
+        });
+      },
+
+      clearConversationHistory: () => {
         set((state) => ({
           pet: {
             ...state.pet,
-            conversationHistory: [...state.pet.conversationHistory, message],
-            lastInteraction: Date.now()
+            conversationHistory: [
+              {
+                id: 'welcome_new',
+                sender: 'pet',
+                content: `Ciao! Ricominciamo da capo! Sono ${state.pet.name}! 🐾`,
+                timestamp: Date.now(),
+                mood: 'excited'
+              }
+            ]
           }
         }));
       },

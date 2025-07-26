@@ -81,6 +81,7 @@ export interface PetStore {
   updatePetStats: (stats: Partial<PetStats>) => void;
   performAction: (action: PetAction) => void;
   addChatMessage: (message: ChatMessage) => void;
+  clearConversationHistory: () => void;
   updatePetMood: (mood: PetMood) => void;
   setPetCharacter: (character: PetCharacter) => void;
   setPetName: (name: string) => void;
