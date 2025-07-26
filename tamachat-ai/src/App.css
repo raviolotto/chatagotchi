@@ -50,3 +50,39 @@
   transition: width 0.5s ease-in-out;
   border-radius: 9999px;
 }
+
+/* Clouds Background Animation - For all characters */
+.clouds-background {
+  background-image: url('/fufi-background.jpg') !important;
+  background-size: 150% auto !important; 
+  background-repeat: repeat-x !important;
+  background-position: 0% center !important;
+  animation: cloudsFlow 60s linear infinite !important;
+  background-color: transparent !important;
+  position: relative;
+  filter: brightness(0.6);
+}
+
+@keyframes cloudsFlow {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 100% center;
+  }
+}
+
+/* Make content semi-transparent when background is active */
+.clouds-background .pet-content-overlay {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure the pet content is visible over the background */
+.pet-content-overlay {
+  position: relative;
+  z-index: 10;
+}

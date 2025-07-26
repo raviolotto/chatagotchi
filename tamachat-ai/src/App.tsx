@@ -44,26 +44,37 @@ function App() {
         {/* Main Content - Side by Side */}
         <div className="flex-1 flex gap-6 items-stretch min-h-0">
           {/* Left Side - Pet Display */}
-          <div className="flex-1 bg-white rounded-3xl p-6 border border-gray-200 flex flex-col justify-center">
-            <PetDisplay
-              character={pet.character}
-              mood={pet.mood}
-              name={pet.name}
-              needsAttention={needsAttention}
-              onNameChange={setPetName}
-              onCharacterChange={setPetCharacter}
-            />
-            <div className="text-sm text-gray-600 capitalize mt-4 text-center">
-              Personalità: {pet.personality} • Umore: {pet.mood}
-            </div>
-            {needsAttention && (
-              <div className="bg-red-50 border border-red-200 rounded-3xl p-3 mt-4">
-                <div className="text-red-600 text-sm font-medium flex items-center justify-center gap-2">
-                  <Heart className="w-4 h-4" />
-                  Ha bisogno di cure!
-                </div>
+          <div 
+            className="flex-1 rounded-3xl p-6 border border-gray-200 flex flex-col justify-center overflow-hidden clouds-background"
+            style={{
+              backgroundImage: 'url(/fufi-background.jpg)',
+              backgroundSize: '150% auto',
+              backgroundRepeat: 'repeat-x',
+              backgroundPosition: '0% center',
+              animation: 'cloudsFlow 60s linear infinite'
+            }}
+          >
+            <div className="pet-content-overlay">
+              <PetDisplay
+                character={pet.character}
+                mood={pet.mood}
+                name={pet.name}
+                needsAttention={needsAttention}
+                onNameChange={setPetName}
+                onCharacterChange={setPetCharacter}
+              />
+              <div className="text-sm text-gray-600 capitalize mt-4 text-center">
+                Personalità: {pet.personality} • Umore: {pet.mood}
               </div>
-            )}
+              {needsAttention && (
+                <div className="bg-red-50 border border-red-200 rounded-3xl p-3 mt-4">
+                  <div className="text-red-600 text-sm font-medium flex items-center justify-center gap-2">
+                    <Heart className="w-4 h-4" />
+                    Ha bisogno di cure!
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Side - Cura/Chat */}
