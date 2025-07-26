@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { usePetStore } from '../../store/petStore';
-import { getAIResponse, isAIServiceAvailable } from '../../services/aiService';
+import { getGroqAIResponse as getAIResponse, isGroqAIServiceAvailable as isAIServiceAvailable } from '../../services/groqAiService';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { ChatMessage as ChatMessageType } from '../../types';
